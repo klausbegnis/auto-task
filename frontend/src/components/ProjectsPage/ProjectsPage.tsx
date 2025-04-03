@@ -1,12 +1,13 @@
 import './ProjectsPage.css';
+import ProjectDetailsButton from '../buttons/ActionButtons/ProjectDetailsButton/ProjectDetailsButton';
 
 function ProjectsPage() {
   // Sample project data - replace with your actual data source
   const projects = [
     {
       id: 1,
-      name: 'E-commerce Platform',
-      description: 'AI-automated online store with dynamic pricing',
+      name: 'Shoes Dot Com',
+      description: 'Your one stop shop for all your shoe needs',
       status: 'active',
       lastUpdated: '2023-11-15',
       issues: 3,
@@ -16,7 +17,7 @@ function ProjectsPage() {
     {
       id: 2,
       name: 'Health Analytics Dashboard',
-      description: 'Real-time health data visualization with AI predictions',
+      description: 'Real-time health data visualization',
       status: 'completed',
       lastUpdated: '2023-10-28',
       issues: 0,
@@ -44,6 +45,16 @@ function ProjectsPage() {
       techStack: ['TypeScript', 'Machine Learning']
     }
   ];
+
+  const handleViewDetails = (projectId: number) => {
+    // Your view details logic here
+    console.log(`Viewing details for project ${projectId}`);
+  };
+  
+  const handleDeleteProject = (projectId: number) => {
+    // Your delete logic here
+    console.log(`Deleting project ${projectId}`);
+  };
 
   return (
     <div className="projects-container">
@@ -110,17 +121,9 @@ function ProjectsPage() {
                 <span key={index} className="tech-tag">{tech}</span>
               ))}
             </div>
-            
-            <div className="project-actions">
-              <button className="btn btn-outline btn-small">
-                View Details
-              </button>
-              <button className="btn btn-outline btn-small">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
+            <ProjectDetailsButton 
+              onDetailsClick={() => handleViewDetails(project.id)}
+            />
           </div>
         ))}
       </div>

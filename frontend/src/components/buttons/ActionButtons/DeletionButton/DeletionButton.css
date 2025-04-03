@@ -1,0 +1,16 @@
+ 
+  .delete-button {
+    width: 34px;
+    height: 34px;
+    color: var(--text-secondary);
+  }
+  
+  .delete-button:hover {
+    color: #ff3b30;
+    border-color: rgba(255, 59, 48, 0.2);
+    background-color: rgba(255, 59, 48, 0.05);
+  }
+  
+  .delete-button svg {
+    stroke-width: 1.5;
+  }

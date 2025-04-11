@@ -100,6 +100,12 @@ class Microservice(ABC):
         """
         pass
 
+    def _addHandler(self, topic, handler):
+        """
+        Add a handler to a topic
+        """
+        self._topic_handlers[topic] = handler
+
     def _requestRegister(self):
         """
         Register the API endpoints

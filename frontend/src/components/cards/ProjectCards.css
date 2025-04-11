@@ -1,0 +1,109 @@
+.project-card {
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    border-top: 4px solid transparent;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .project-card.active {
+    border-top-color: var(--accent-color);
+  }
+  
+  .project-card.completed {
+    border-top-color: #34c759;
+  }
+  
+  .project-card.paused {
+    border-top-color: #ff9500;
+  }
+  
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .project-header h3 {
+    font-size: 1.25rem;
+    margin-right: 1rem;
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  
+  .status-badge.active {
+    background-color: rgba(0, 113, 227, 0.1);
+    color: var(--accent-color);
+  }
+  
+  .status-badge.completed {
+    background-color: rgba(52, 199, 89, 0.1);
+    color: #34c759;
+  }
+  
+  .status-badge.paused {
+    background-color: rgba(255, 149, 0, 0.1);
+    color: #ff9500;
+  }
+  
+  .project-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+  }
+  
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-secondary);
+  }
+  
+  .meta-item svg {
+    opacity: 0.7;
+  }
+  
+  .tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .tech-tag {
+    background-color: var(--off-white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+  }
+  
+  .project-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  

@@ -15,7 +15,7 @@ function LandingPage() {
             and code reviews so you can focus on what matters.
           </p>
           <div className="hero-cta">
-            <button className="btn btn-primary" onClick={() => navigate('/projects')}>Get Started</button>
+            <button className="btn btn-primary" onClick={() => navigate('/app/projects')}>Get Started</button>
             <button className="btn btn-outline">See How It Works</button>
           </div>
         </div>

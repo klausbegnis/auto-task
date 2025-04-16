@@ -3,6 +3,8 @@ from kafka import KafkaConsumer, KafkaProducer
 import threading
 import uvicorn
 import logging
+import json
+from time import time
 from datetime import datetime
 from abc import ABC, abstractmethod
 
@@ -52,6 +54,8 @@ class Microservice(ABC):
         self.host = host
         # Initialize the FastAPI app
         self._api = FastAPI(title=self.title, description=self.description, version=self.version)
+        self._unicorn_server = None
+        self._uvicorn_thread = None
         
         # Available routes for the API
         # "endpoint" : {
@@ -76,22 +80,49 @@ class Microservice(ABC):
         Return the FastAPI app  
         """
         return self._api
-    
-    def __del__(self):
+
+    def shutdown(self):
         """
-        Destructor for the Microservice
+        Close all connections from Microservice 
+        (__del__) garbage collector already delete a few elements
+        Use this function on the end of lifetime for extra safety
         """
+        try:
 
-        logging.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Destroying Microservice instance")
+            logging.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Destroying Microservice instance")
+            # check if the consumer and producer are not none
+            # and close them
+            if self._consumer:
+                self._consumer.close()
+                self._consume_thread = None
+                logging.info("Kafka consumer closed")
 
-        # Clean up Kafka resources
-        if self._consumer:
-            self._consumer.close()
-            logging.info("Kafka consumer closed")
+            if self._producer:
+                self._producer.close()
+                logging.info("Kafka producer closed")
 
-        if self._producer:
-            self._producer.close()
-            logging.info("Kafka producer closed")
+            # closes the API server
+            if self._uvicorn_server and self._uvicorn_server.should_exit is False:
+                self._uvicorn_server.should_exit = True
+                timedOut = False
+                time_out_seconds = 30
+                test_interval = 0.1
+                wait_counter = 0
+                # constantly checks if the uvicorn server closed correctly
+                while self._uvicorn_thread.is_alive() and not(timedOut):
+                    time.sleep(test_interval)
+                    wait_counter += test_interval
+                    if test_interval >= time_out_seconds:
+                        timedOut = True
+                
+                if timedOut:
+                    logging.warning("Uvicorn server exit timedout, proceeding to kill thread directly.")
+
+                self._uvicorn_thread.join()
+                logging.info("Uvicorn server stopped")
+
+        except Exception as e:
+            logging.warning(f"Exception during shutdown: {e}")
 
     @abstractmethod
     def _addRoutes(self):
@@ -138,7 +169,10 @@ class Microservice(ABC):
 
         try:    
             # Run the FastAPI app
-            uvicorn.run(self._api, host=self.host, port=self.port)
+            self._unicorn_server = uvicorn.Server(self._api, host=self.host, port=self.port)
+            self._uvicorn_thread = threading.Thread(target=self._uvicorn_server.run, daemon=True)
+            self._uvicorn_thread.start()
+
         except Exception as e:
             logging.error(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Error while running the FastAPI app: " + str(e))
     
@@ -218,8 +252,8 @@ class Microservice(ABC):
         # Publish the message to the Kafka topic    
         try:
             if isinstance(message, str):
-                message = message.encode("utf-8")
-            self._producer.send(topic, json.dumps(message).encode("utf-8"))
+                message = json.dumps(message)
+            self._producer.send(topic, message.encode("utf-8"))
         except Exception as e:
             logging.error(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Raised exception while publishing the message to the Kafka topic: " + str(e)) 
     

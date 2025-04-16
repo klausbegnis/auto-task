@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+#from unittest.mock import MagicMock, patch
 from classes.abstracts.Microservice import Microservice
 
 class DummyService(Microservice):
@@ -48,3 +48,14 @@ def test_initKafkaProducer():
 
     service.initKafkaProducer()
     assert service._producer is not None
+
+def test_run():
+    service = DummyService(kafkaConfig={
+        "subscribedTopics": [],
+        "publishTopics": [],
+        "bootstrap.servers": "localhost:9092",
+        "group.id": "test-group",
+        "auto.offset.reset": "earliest" 
+    })
+
+    service.run()

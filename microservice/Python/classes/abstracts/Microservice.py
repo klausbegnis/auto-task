@@ -54,8 +54,6 @@ class Microservice(ABC):
         self.host = host
         # Initialize the FastAPI app
         self._api = FastAPI(title=self.title, description=self.description, version=self.version)
-        self._unicorn_server = None
-        self._uvicorn_thread = None
         
         # Available routes for the API
         # "endpoint" : {
@@ -100,26 +98,6 @@ class Microservice(ABC):
             if self._producer:
                 self._producer.close()
                 logging.info("Kafka producer closed")
-
-            # closes the API server
-            if self._uvicorn_server and self._uvicorn_server.should_exit is False:
-                self._uvicorn_server.should_exit = True
-                timedOut = False
-                time_out_seconds = 30
-                test_interval = 0.1
-                wait_counter = 0
-                # constantly checks if the uvicorn server closed correctly
-                while self._uvicorn_thread.is_alive() and not(timedOut):
-                    time.sleep(test_interval)
-                    wait_counter += test_interval
-                    if test_interval >= time_out_seconds:
-                        timedOut = True
-                
-                if timedOut:
-                    logging.warning("Uvicorn server exit timedout, proceeding to kill thread directly.")
-
-                self._uvicorn_thread.join()
-                logging.info("Uvicorn server stopped")
 
         except Exception as e:
             logging.warning(f"Exception during shutdown: {e}")
@@ -168,10 +146,7 @@ class Microservice(ABC):
         logging.info(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - API is running on " + self.host + ":" + str(self.port))
 
         try:    
-            # Run the FastAPI app
-            self._unicorn_server = uvicorn.Server(self._api, host=self.host, port=self.port)
-            self._uvicorn_thread = threading.Thread(target=self._uvicorn_server.run, daemon=True)
-            self._uvicorn_thread.start()
+            uvicorn.run(self._api, host=self.host, port=self.port)
 
         except Exception as e:
             logging.error(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Error while running the FastAPI app: " + str(e))

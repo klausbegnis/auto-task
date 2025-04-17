@@ -10,6 +10,7 @@ class DummyService(MicroserviceWithKafka):
     def _test_topic_handler(self, *args):
         pass
 
+@pytest.mark.unit
 def test_microservice_registers_routes():
     service = DummyService(kafkaConfig={
         "subscribedTopics": ['test-topic'],
@@ -21,6 +22,7 @@ def test_microservice_registers_routes():
     print(service._topic_handlers)
     assert 'test-topic'in service._topic_handlers.keys()
 
+@pytest.mark.unit
 def test_initKafkaConsumer():
     service = DummyService(kafkaConfig={
         "subscribedTopics": ['test-topic'],
@@ -33,6 +35,7 @@ def test_initKafkaConsumer():
     service.initKafkaConsumer()
     assert service._consumer is not None
 
+@pytest.mark.unit
 def test_initKafkaProducer():
     service = DummyService(kafkaConfig={
         "subscribedTopics": [],

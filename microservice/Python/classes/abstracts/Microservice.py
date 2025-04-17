@@ -91,18 +91,3 @@ class Microservice(ABC):
 
         except Exception as e:
             logging.error(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Error while running the FastAPI app: " + str(e))
-    
-
-        """
-        Handle a message from a Kafka topic
-        """
-        
-        # Get the handler for the topic
-        try:
-            handler = self._topic_handlers[topic]
-        except Exception as e:
-            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Topic: " + topic + " with no topic handler")
-            return
-
-        # Call the handler
-        handler(message)

@@ -13,6 +13,7 @@ class DummyService(Microservice):
     def ping(self):
         return {"message": "pong"}
 
+@pytest.mark.unit
 def test_microservice_registers_routes():
     service = DummyService()
 

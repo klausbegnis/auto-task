@@ -65,13 +65,6 @@ class MicroserviceWithKafka(Microservice):
             logging.warning(f"Exception during shutdown: {e}")
 
     @abstractmethod
-    def _addRoutes(self):
-        """
-        Add the routes to the FastAPI app
-        """
-        pass
-
-    @abstractmethod
     def _addHandlers(self):
         """
         Add the handlers to the subscribed topics

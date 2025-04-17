@@ -7,7 +7,7 @@ class DummyService(MicroserviceWithKafka):
         pass
     def _addHandlers(self):
         self._registerHandlers('test-topic', self._test_topic_handler)
-    def _test_topic_handler(self):
+    def _test_topic_handler(self, *args):
         pass
 
 def test_microservice_registers_routes():

@@ -17,6 +17,7 @@ class DummyMicroservice(MicroserviceWithKafka):
     def _test_topic_handler(self, message):
         self.received_messages.append(message)
 
+@pytest.mark.integration
 def test_ConsumeAndPublish():
     service = DummyMicroservice(kafkaConfig={
         "subscribedTopics": ['test-topic'],

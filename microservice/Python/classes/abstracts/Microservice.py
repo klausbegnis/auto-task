@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 import uvicorn
 import logging
 from datetime import datetime
 from abc import ABC, abstractmethod
+import jwt
+from jwt import InvalidTokenError
 
 class Microservice(ABC):
     def __init__(self, host="0.0.0.0", port=8001, title="no-name-microservice", description="empty description", version="0.0.0"):
@@ -91,3 +93,23 @@ class Microservice(ABC):
 
         except Exception as e:
             logging.error(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " - Error while running the FastAPI app: " + str(e))
+
+    def _validate_internal_jwt(self, request: Request, secret_key: str = None):
+        """
+        Validates the JWT provided in the Authorization header of the request.
+        """
+        # Get Authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f"[Microservice] - missing authorization header {request}")
+            raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+
+        token = auth_header.split(" ")[1]
+
+        try:
+            # Decode the JWT
+            payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+            return payload
+        except InvalidTokenError as e:
+            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f"[JWT ERROR] {e}")
+            raise HTTPException(status_code=403, detail="Invalid or expired token")

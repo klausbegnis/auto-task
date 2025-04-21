@@ -2,6 +2,10 @@
 
 ## Description
 
+This is an AI-powered development assistance platform that connects directly your gitHub to LLM models. Generate automatically issue's solutions through the API, with the addition to code automated code review by a second LLM model.
+
+WIP
+
 ## Diagrams
 
 ### Project Diagram

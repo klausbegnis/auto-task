@@ -89,9 +89,3 @@ class GitHubService(Microservice):
         # Write back to the file
         with open(file_path, 'w') as token_file:
             json.dump(data, token_file, indent=4)
-
-
-
-if __name__ == '__main__':
-    service = GitHubService()
-    service.run()

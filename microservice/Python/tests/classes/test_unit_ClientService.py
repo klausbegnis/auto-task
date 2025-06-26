@@ -5,7 +5,6 @@ from classes.ClientService import ClientService
 @pytest.fixture
 def client():
     service = ClientService()
-    
     # Use the __call__ method to get the FastAPI app instance
     app = service()
     
@@ -17,7 +16,7 @@ def client():
 @pytest.mark.unit
 def test_register(client):
     # Sucessfully create an account
-    data = {"user":"klausbegnis",
+    data = {"username":"klausbegnis",
             "email":"klaus@begnis.com",
             "password" : "!nj1247681"}
     # Request the /register endpoint without token in the header
@@ -27,6 +26,6 @@ def test_register(client):
     assert response.status_code == 200
     response_data = response.json()
     assert isinstance(response_data, dict)
-    assert response_data.get("user") == data.get("user")
+    assert response_data.get("user") == data.get("username")
 
     

@@ -62,5 +62,4 @@ htmlcov/
 *.log
 *.bak
 *.tmp
-
-token_bearer.json
+secrets

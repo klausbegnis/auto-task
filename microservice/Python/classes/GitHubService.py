@@ -10,7 +10,7 @@ class GitHubService(Microservice):
         super().__init__(host, port, title, description, version)
         
         self._git_api_url = "https://api.github.com/"
-        self.__secret_key = "123ua8sd9123h1k!@#!K$1j"
+        self.__secret_key_internal = self._load_internal_jwt_key() # to communicate using jwt with other services
 
     def _create_headers(self, token):
         return {
@@ -37,6 +37,15 @@ class GitHubService(Microservice):
         }
 
     def _load_token(self, user):
+        """
+        Loads the saved token from a user:
+
+        Params:
+            user [str]
+        
+        Returns:
+            token [str]
+        """
         with open('/home/token_bearer.json') as token_file: # change this to use database in the future
             try:
                return(json.load(token_file)[user]["token"])
@@ -46,10 +55,26 @@ class GitHubService(Microservice):
 
 
     def _im_alive(self):
+        """
+        Health check!
+
+        Returns:
+            True [bool]
+        """
         return True
 
     def _list_reps(self, request: Request):
-        payload = self._validate_internal_jwt(request, secret_key=self.__secret_key)
+        """
+        List all repositories from user.
+
+        Params:
+            Request [PyDantic]
+                {jwt encoded bearer token} -> contains "sub" key with username
+        
+        Returns:
+            JSON Response [list]
+        """
+        payload = self._validate_internal_jwt(request, secret_key=self.__secret_key_internal)
         user = payload.get("sub")
         if not user:
             logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " [/list-reps]- User id not mentioned in token.")
@@ -62,18 +87,46 @@ class GitHubService(Microservice):
         return response.json()
 
     def _save_token(self, request: Request):
-        payload = self._validate_internal_jwt(request, secret_key=self.__secret_key)
+        """
+        Saves the GitHub token from a user:
+
+        Params:
+            Request [PyDantic]
+                {jwt encoded bearer token} -> 
+                    {
+                        sub : [str],
+                        git_token: [str]
+                    }
+        Returns:
+            HTTPStatusCode
+        
+        """
+        payload = self._validate_internal_jwt(request, secret_key=self.__secret_key_internal)
         user = payload.get("sub")
         if not user:
             logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " [/list-reps]- User id missing in token.")
             raise HTTPException(status_code=400, detail="Missing 'sub' in token payload")
         token = payload.get("git_token")
-        if not user:
-            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " [/list-reps]- User token missing in payload.")
+        if not token:
+            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f" [/list-reps]- User token for {user} missing in payload.")
             raise HTTPException(status_code=400, detail="Missing 'token' in request payload")
-        self._store_token(user, token)
+        try:
+            self._store_token(user, token)
+        except:
+            logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f" [/list-reps]- failed to save token for user: {user}.")
+            raise HTTPException(status_code=400, detail=f"Failed to save token for user: {user}")
+        return {"message": "Token saved successfully", "user": user}
 
     def _store_token(self, user, token):
+
+        """
+        Stores the user and token into the DB.
+
+        Params:
+            user : [str]
+            token : [str]
+        """
+
         file_path = '/home/token_bearer.json'
 
         try:

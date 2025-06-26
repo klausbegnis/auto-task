@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from abc import ABC, abstractmethod
 import jwt
+import json
 from jwt import InvalidTokenError
 
 class Microservice(ABC):
@@ -113,3 +114,7 @@ class Microservice(ABC):
         except InvalidTokenError as e:
             logging.warning(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + f"[JWT ERROR] {e}")
             raise HTTPException(status_code=403, detail="Invalid or expired token")
+    
+    def _load_internal_jwt_key(self):
+        with open("./secrets/internal_secret_key.json") as f:
+            return json.load(f)['secret_key']

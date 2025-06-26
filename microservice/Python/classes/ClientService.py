@@ -1,12 +1,13 @@
 from classes.abstracts.Microservice import Microservice
 from fastapi import Request
+from classes.dataModels.data_models import UserLogin, CreateUser
 import json
 import logging
 
 class ClientService(Microservice):
     def __init__(self, host="0.0.0.0", port=8010, title="client-service", description="Microservice fo client authentication", version="0.0.1"):
         super().__init__(host, port, title, description, version)
-        self.__secret_key_internal = "123ua8sd9123h1k!@#!K$1j" # to communicate using jwt with other services
+        self.__secret_key_internal = self._load_internal_jwt_key()
     
     def _addRoutes(self):
         self.availableRoutes['/'] = {
@@ -29,18 +30,16 @@ class ClientService(Microservice):
     def _im_alive(self):
         return True
     
-    async def _register(self, request: Request):
-        data = await request.json()
+    def _register(self, credentials: CreateUser):
 
-        user = data.get("user")
-        password = data.get("password")
-        email = data.get("email")
+        username = credentials.username
+        password = credentials.password
+        email = credentials.email
 
-        # encrypt and save - return webcookie with session token
-
-        return {"user" : data.get("user")}
+        # encrypt and save
+        return {"user" : username}
     
-    def _login(self, request: Request):
+    def _login(self, user_data: UserLogin):
         pass
     
     def create_session_cookie(self):

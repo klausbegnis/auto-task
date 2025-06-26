@@ -4,7 +4,7 @@
 
 This is an AI-powered development assistance platform that connects directly your gitHub to LLM models. Generate automatically issue's solutions through the API, with the addition to automated code review by a second LLM model.
 
-WIP
+The core idea is to study descentralized architectures using Kafka, Python APIs, Lakehouse and AI.
 
 ## Diagrams
 
